@@ -51,9 +51,12 @@ this.ball.setCollideWorldBounds(true);
 
 this.ball.setBounce(1, 1);
 
-this.leftPaddle = this.add.image(50, 384, "paddle");
+this.leftPaddle = this.physics.add.image(50, 384, "paddle");
 
-this.rightPaddle = this.add.image(974, 384, "paddle");
+this.rightPaddle = this.physics.add.image(974, 384, "paddle");
+
+this.physics.add.collider(this.ball, this.leftPaddle, this. hitPaddle, null, this);
+this.physics.add.collider(this.ball, this.rightPaddle, this. hitPaddle, null, this);
 
 this.cursors = this.input.keyboard.createCursorKeys();
 this.wasd = this.input.keyboard.addKeys({
