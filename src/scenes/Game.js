@@ -1,78 +1,59 @@
-import { DOWN, Scene, UP } from 'phaser';
-
 const WIDTH = 1024;
-
 const HEIGHT = 768;
 
-export class Game extends Scene {
-
+class BallGame extends Phaser.Scene {
     constructor() {
-
         super('Game');
-        this.wasd = null;
-        this.cursors = null;
+        
         this.ball = null;
         this.leftPaddle = null;
         this.rightPaddle = null;
-        this.ballInMotion = false;
+        this.ballInMotion = false; // Flag to track ball movement
     }
 
     preload() {
-
-        // Load necessary assets from the assets directory
-
         this.load.image('background', 'assets/background.png');
         this.load.image('ball', 'assets/ball.png');
         this.load.image('paddle', 'assets/paddle.png');
-
     }
 
     create() {
+        // Set background image
+        this.add.image(WIDTH / 2, HEIGHT / 2, 'background');
 
-        this.add.image(WIDTH / 2, HEIGHT / 2, 'background').setScale(0.8, 0.8);
-        this.ball = this.physics.add.image(WIDTH / 2, HEIGHT / 2, 'ball').setScale(0.05, 0.05).refreshBody();
+        // Create ball with physics properties
+        this.ball = this.physics.add.image(WIDTH / 2, HEIGHT / 2, 'ball').setScale(0.05);
         this.ball.setCollideWorldBounds(true);
         this.ball.setBounce(1, 1);
-        this.leftPaddle = this.add.image(50, 384, "paddle");
-        this.rightPaddle = this.add.image(974, 384, "paddle");
+        this.ball.setVelocity(200, 200);
+
+        // Create paddles as static physics objects
+        this.leftPaddle = this.physics.add.staticImage(50, HEIGHT / 2, 'paddle');
+        this.rightPaddle = this.physics.add.staticImage(WIDTH - 50, HEIGHT / 2, 'paddle');
+
+        // Enable collision between ball and paddles
+        this.physics.add.collider(this.ball, this.leftPaddle);
+        this.physics.add.collider(this.ball, this.rightPaddle);
+
+        // Listen for SPACE key to start ball movement
+        this.input.keyboard.on('keydown-SPACE', this.launchBall, this);
+        
+        // Setup keyboard controls
         this.cursors = this.input.keyboard.createCursorKeys();
         this.wasd = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
             down: Phaser.Input.Keyboard.KeyCodes.S
-
         });
-
-        // Listen for "keyspace down" event, calling startBall function upon press
-
-        this.input.keyboard.on('keydown-SPACE', this.startBall, this);
-
     }
 
     update() {
-        if (this.wasd.up.isDown && this.leftPaddle.y > 0) {
-            this.leftPaddle.y -=5;
-        } else if (this.wasd.up.isdown && this.leftPaddle.y < HEIGHT) {
-            this.leftPaddle.y +=5;
-        }
-        
-        if (this.wasd.up.isDown && this.rightPaddle.y > 0) {
-            this.rightPaddle.y -=5;
-        } else if (this.wasd.up.isdown && this.rightPaddle.y < HEIGHT) {
-            this.rightPaddle.y +=5;
-        }
+        // Game update logic (if needed)
     }
 
-    startBall() {
-
-        if (!this.ballInMotion) { // checks flag to determine if ball is NOT in motion
-            let initialVelocityX = 300 * (Phaser.Math.Between(0, 1) ? 1 : -1); // sets to either 300 or -300
-            let initialVelocityY = 300 * (Phaser.Math.Between(0, 1) ? 1 : -1); // sets to either 300 or -300
-            this.ball.setVelocity(initialVelocityX, initialVelocityY); // sets ball to RANDOM velocity
-            this.ballInMotion = true; // sets flag to ball is in motion
+    launchBall() {
+        if (!this.ballInMotion) {
+            this.ball.setVelocity(200, 200);
+            this.ballInMotion = true;
         }
-
     }
-
-    
-
 }
